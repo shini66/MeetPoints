@@ -1,5 +1,5 @@
 {
-  "name": "entrevistas-checklist",
+  "name": "meetpoints",
   "version": "1.0.0",
   "description": "Checklist local de entrevistas a candidatos, con SQLite embebido. 100% offline.",
   "main": "main.js",

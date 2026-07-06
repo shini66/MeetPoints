@@ -1,4 +1,4 @@
-# Entrevistas - Checklist
+# MeetPoints
 
 App de escritorio local (Electron) para no olvidarte de los puntos clave en cada entrevista a candidatos. Corre 100% offline, guarda todo en un archivo SQLite local usando `sql.js` (no necesita compilar nada nativo, así que `npm install` no debería darte problemas en Windows/Mac/Linux).
 
@@ -7,7 +7,7 @@ App de escritorio local (Electron) para no olvidarte de los puntos clave en cada
 Necesitás Node.js instalado (cualquier versión reciente sirve).
 
 ```bash
-cd entrevistas-checklist
+cd meetpoints
 npm install
 npm start
 ```
@@ -27,9 +27,9 @@ Todo se guarda automáticamente (sin botón de "guardar"): cada cambio se persis
 
 La base SQLite vive en la carpeta de datos de usuario de tu sistema (fuera de la carpeta del proyecto), algo como:
 
-- **Windows**: `%APPDATA%\entrevistas-checklist\entrevistas.sqlite`
-- **Mac**: `~/Library/Application Support/entrevistas-checklist/entrevistas.sqlite`
-- **Linux**: `~/.config/entrevistas-checklist/entrevistas.sqlite`
+- **Windows**: `%APPDATA%\meetpoints\meetpoints.sqlite`
+- **Mac**: `~/Library/Application Support/meetpoints/meetpoints.sqlite`
+- **Linux**: `~/.config/meetpoints/meetpoints.sqlite`
 
 Si alguna vez querés arrancar de cero del todo (perder también la lista de puntos), simplemente borrá ese archivo — la app crea uno nuevo con los 4 puntos por defecto la próxima vez que la abras.
 
@@ -40,7 +40,7 @@ Este proyecto no incluye empaquetado todavía (`npm start` corre la app en modo 
 ## Estructura del proyecto
 
 ```
-entrevistas-checklist/
+meetpoints/
 ├── main.js          # proceso principal de Electron, crea la ventana y expone la API vía IPC
 ├── preload.js       # puente seguro entre el renderer y el proceso principal
 ├── db.js            # toda la lógica de SQLite (sql.js)

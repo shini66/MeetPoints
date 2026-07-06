@@ -14,7 +14,7 @@ async function initDb() {
     locateFile: (file) => path.join(__dirname, 'node_modules', 'sql.js', 'dist', file)
   });
 
-  dbPath = path.join(app.getPath('userData'), 'entrevistas.sqlite');
+  dbPath = path.join(app.getPath('userData'), 'meetpoints.sqlite');
 
   if (fs.existsSync(dbPath)) {
     const buffer = fs.readFileSync(dbPath);
