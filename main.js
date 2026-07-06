@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const db = require('./db');
 
@@ -25,14 +25,25 @@ async function createWindow() {
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 }
 
-app.whenReady().then(createWindow);
+function createWindowOrQuit() {
+  createWindow().catch((err) => {
+    console.error('Failed to start app:', err);
+    dialog.showErrorBox(
+      'MeetPoints',
+      'No se pudo iniciar la aplicación. Los datos guardados podrían estar dañados.'
+    );
+    app.quit();
+  });
+}
+
+app.whenReady().then(createWindowOrQuit);
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
 app.on('activate', () => {
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (BrowserWindow.getAllWindows().length === 0) createWindowOrQuit();
 });
 
 function handle(channel, handler) {

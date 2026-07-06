@@ -54,13 +54,6 @@ function migrateDb() {
     changed = true;
   }
 
-  if (columns.has('text')) {
-    db.run("UPDATE items SET title = CASE WHEN title = '' THEN text ELSE title END");
-    changed = true;
-  }
-
-  db.run("UPDATE items SET description = COALESCE(description, '')");
-
   if (changed) {
     persist();
   }
