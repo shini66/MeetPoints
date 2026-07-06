@@ -35,6 +35,9 @@ const copy = {
     error: 'Algo falló. Probá de nuevo.',
     exportLabel: 'Exportar',
     exported: 'Exportado correctamente',
+    importLabel: 'Importar',
+    imported: 'Importado correctamente',
+    progress: '{checked}/{total} completados',
     deleteAria: 'Eliminar punto {title}',
     deleteMessage: 'Vas a eliminar "{title}". Esta acción no se puede deshacer.',
     deleteFallbackTitle: 'este punto',
@@ -62,6 +65,9 @@ const copy = {
     error: 'Something went wrong. Please try again.',
     exportLabel: 'Export',
     exported: 'Exported successfully',
+    importLabel: 'Import',
+    imported: 'Imported successfully',
+    progress: '{checked}/{total} completed',
     deleteAria: 'Delete point {title}',
     deleteMessage: 'You are about to delete "{title}". This action cannot be undone.',
     deleteFallbackTitle: 'this point',
@@ -187,9 +193,102 @@ async function confirmDelete() {
   }
 }
 
+function updateProgress() {
+  const progressEl = document.getElementById('progress');
+  const total = state.items.length;
+
+  if (!total) {
+    progressEl.textContent = '';
+    return;
+  }
+
+  const checked = state.items.filter((item) => item.checked).length;
+  progressEl.textContent = t('progress', { checked, total });
+}
+
+async function commitFieldEdit(item, field, value) {
+  const newTitle = field === 'title' ? value : item.title;
+  const newDescription = field === 'description' ? value : item.description;
+
+  if (field === 'title' && !newTitle) {
+    renderItems();
+    return;
+  }
+
+  if (newTitle === item.title && newDescription === item.description) {
+    renderItems();
+    return;
+  }
+
+  try {
+    state = await window.api.updateItem(item.id, newTitle, newDescription);
+    renderItems();
+    setStatus(t('saved'));
+  } catch (err) {
+    console.error(err);
+    setStatus(t('error'));
+  }
+}
+
+function startEditingField(item, element, field) {
+  const isDescription = field === 'description';
+  const input = document.createElement(isDescription ? 'textarea' : 'input');
+
+  if (!isDescription) {
+    input.type = 'text';
+  } else {
+    input.rows = 3;
+  }
+
+  input.className = isDescription ? 'item-description-input' : 'item-title-input';
+  input.value = field === 'title' ? item.title : item.description;
+  element.replaceWith(input);
+  input.focus();
+  input.select();
+
+  let settled = false;
+
+  input.addEventListener('blur', () => {
+    if (settled) return;
+    settled = true;
+    commitFieldEdit(item, field, input.value.trim());
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' && !isDescription) {
+      event.preventDefault();
+      input.blur();
+    } else if (event.key === 'Escape') {
+      settled = true;
+      renderItems();
+    }
+  });
+}
+
+async function moveItem(draggedId, targetId) {
+  if (draggedId === targetId) return;
+
+  const ids = state.items.map((item) => item.id);
+  const fromIndex = ids.indexOf(draggedId);
+  const toIndex = ids.indexOf(targetId);
+
+  if (fromIndex === -1 || toIndex === -1) return;
+
+  ids.splice(toIndex, 0, ids.splice(fromIndex, 1)[0]);
+
+  try {
+    state = await window.api.reorderItems(ids);
+    renderItems();
+  } catch (err) {
+    console.error(err);
+    setStatus(t('error'));
+  }
+}
+
 function renderItems() {
   const container = document.getElementById('items');
   container.innerHTML = '';
+  updateProgress();
 
   if (!state.items.length) {
     const emptyState = document.createElement('p');
@@ -202,6 +301,33 @@ function renderItems() {
   state.items.forEach((item) => {
     const row = document.createElement('article');
     row.className = 'item-row';
+    row.draggable = true;
+
+    row.addEventListener('dragstart', (event) => {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', String(item.id));
+      row.classList.add('dragging');
+    });
+
+    row.addEventListener('dragend', () => {
+      row.classList.remove('dragging');
+    });
+
+    row.addEventListener('dragover', (event) => {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+    });
+
+    row.addEventListener('drop', (event) => {
+      event.preventDefault();
+      const draggedId = Number(event.dataTransfer.getData('text/plain'));
+      moveItem(draggedId, item.id);
+    });
+
+    const dragHandle = document.createElement('span');
+    dragHandle.className = 'drag-handle';
+    dragHandle.textContent = '⠿';
+    dragHandle.setAttribute('aria-hidden', 'true');
 
     const checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
@@ -224,10 +350,12 @@ function renderItems() {
     const title = document.createElement('h2');
     title.className = 'item-title';
     title.textContent = item.title;
+    title.addEventListener('click', () => startEditingField(item, title, 'title'));
 
     const description = document.createElement('p');
     description.className = 'item-description';
     description.textContent = item.description || t('noDescription');
+    description.addEventListener('click', () => startEditingField(item, description, 'description'));
 
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
@@ -244,6 +372,7 @@ function renderItems() {
 
     content.appendChild(title);
     content.appendChild(description);
+    row.appendChild(dragHandle);
     row.appendChild(checkbox);
     row.appendChild(content);
     row.appendChild(deleteButton);
@@ -340,6 +469,19 @@ async function init() {
       const result = await window.api.exportData();
       if (result.exported) {
         setStatus(t('exported'));
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus(t('error'));
+    }
+  });
+  document.getElementById('import-btn').addEventListener('click', async () => {
+    try {
+      const result = await window.api.importData();
+      if (result.imported) {
+        state = result.state;
+        renderItems();
+        setStatus(t('imported'));
       }
     } catch (err) {
       console.error(err);

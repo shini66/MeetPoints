@@ -109,11 +109,42 @@ function resetInterview() {
   return getState();
 }
 
+function updateItem(id, title, description) {
+  db.run('UPDATE items SET title = ?, description = ? WHERE id = ?', [title, description, id]);
+  persist();
+  return getState();
+}
+
+function reorderItems(orderedIds) {
+  orderedIds.forEach((id, position) => {
+    db.run('UPDATE items SET position = ? WHERE id = ?', [position, id]);
+  });
+  persist();
+  return getState();
+}
+
+function replaceItems(items) {
+  db.run('DELETE FROM items');
+  items.forEach((item, position) => {
+    db.run('INSERT INTO items (title, description, checked, position) VALUES (?, ?, ?, ?)', [
+      item.title,
+      item.description,
+      item.checked ? 1 : 0,
+      position
+    ]);
+  });
+  persist();
+  return getState();
+}
+
 module.exports = {
   initDb,
   getState,
   addItem,
   deleteItem,
   toggleItem,
-  resetInterview
+  resetInterview,
+  updateItem,
+  reorderItems,
+  replaceItems
 };

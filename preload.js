@@ -6,5 +6,8 @@ contextBridge.exposeInMainWorld('api', {
   deleteItem: (id) => ipcRenderer.invoke('delete-item', id),
   toggleItem: (id, checked) => ipcRenderer.invoke('toggle-item', id, checked),
   resetInterview: () => ipcRenderer.invoke('reset-interview'),
-  exportData: () => ipcRenderer.invoke('export-data')
+  exportData: () => ipcRenderer.invoke('export-data'),
+  importData: () => ipcRenderer.invoke('import-data'),
+  updateItem: (id, title, description) => ipcRenderer.invoke('update-item', id, title, description),
+  reorderItems: (orderedIds) => ipcRenderer.invoke('reorder-items', orderedIds)
 });
