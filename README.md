@@ -32,13 +32,16 @@ La base SQLite vive en la carpeta de datos de usuario de tu sistema (fuera de la
 
 Si alguna vez querés arrancar de cero del todo (perder también la lista de puntos), simplemente borrá ese archivo — la app crea uno nuevo (vacío) la próxima vez que la abras.
 
-## Generar el .exe portable
+## Generar los ejecutables de Windows
 
 ```bash
 npm run dist
 ```
 
-Genera `release/MeetPoints <versión>.exe` — un ejecutable portable de Windows que no necesita instalador ni Node.js instalado en la máquina que lo corre. Se hace con `electron-builder` (configurado en `package.json`, campo `build`).
+Genera dos artefactos en `release/` (con `electron-builder`, configurado en `package.json`, campo `build`):
+
+- **`MeetPoints <versión>.exe`**: portable, un solo archivo, no requiere instalación ni Node.js. Ideal para probar rápido o llevar en un pendrive.
+- **`MeetPoints Setup <versión>.exe`**: instalador NSIS. Se instala en `%LOCALAPPDATA%\Programs\meetpoints`, queda en "Agregar o quitar programas", y al desinstalar borra también los datos guardados (`deleteAppDataOnUninstall`).
 
 ## Estructura del proyecto
 
