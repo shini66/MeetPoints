@@ -35,8 +35,19 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-ipcMain.handle('get-state', () => db.getState());
-ipcMain.handle('add-item', (_e, title, description) => db.addItem(title, description));
-ipcMain.handle('delete-item', (_e, id) => db.deleteItem(id));
-ipcMain.handle('toggle-item', (_e, id, checked) => db.toggleItem(id, checked));
-ipcMain.handle('reset-interview', () => db.resetInterview());
+function handle(channel, handler) {
+  ipcMain.handle(channel, async (...args) => {
+    try {
+      return await handler(...args);
+    } catch (err) {
+      console.error(`IPC "${channel}" failed:`, err);
+      throw new Error(`ipc-failed:${channel}`);
+    }
+  });
+}
+
+handle('get-state', () => db.getState());
+handle('add-item', (_e, title, description) => db.addItem(title, description));
+handle('delete-item', (_e, id) => db.deleteItem(id));
+handle('toggle-item', (_e, id, checked) => db.toggleItem(id, checked));
+handle('reset-interview', () => db.resetInterview());

@@ -32,6 +32,7 @@ const copy = {
     saved: 'Guardado',
     deleted: 'Punto eliminado',
     resetDone: 'Checklist listo para una nueva entrevista',
+    error: 'Algo falló. Probá de nuevo.',
     deleteAria: 'Eliminar punto {title}',
     deleteMessage: 'Vas a eliminar "{title}". Esta acción no se puede deshacer.',
     deleteFallbackTitle: 'este punto',
@@ -56,6 +57,7 @@ const copy = {
     saved: 'Saved',
     deleted: 'Point deleted',
     resetDone: 'Checklist ready for a new interview',
+    error: 'Something went wrong. Please try again.',
     deleteAria: 'Delete point {title}',
     deleteMessage: 'You are about to delete "{title}". This action cannot be undone.',
     deleteFallbackTitle: 'this point',
@@ -167,13 +169,18 @@ async function confirmDelete() {
     return;
   }
 
-  state = {
-    ...state,
-    ...(await window.api.deleteItem(state.pendingDeleteId))
-  };
-  renderItems();
-  closeDeleteModal();
-  setStatus(t('deleted'));
+  try {
+    state = {
+      ...state,
+      ...(await window.api.deleteItem(state.pendingDeleteId))
+    };
+    renderItems();
+    closeDeleteModal();
+    setStatus(t('deleted'));
+  } catch (err) {
+    console.error(err);
+    setStatus(t('error'));
+  }
 }
 
 function renderItems() {
@@ -196,9 +203,15 @@ function renderItems() {
     checkbox.type = 'checkbox';
     checkbox.checked = item.checked;
     checkbox.addEventListener('change', async () => {
-      state = await window.api.toggleItem(item.id, checkbox.checked);
-      renderItems();
-      setStatus(t('saved'));
+      try {
+        state = await window.api.toggleItem(item.id, checkbox.checked);
+        renderItems();
+        setStatus(t('saved'));
+      } catch (err) {
+        console.error(err);
+        checkbox.checked = !checkbox.checked;
+        setStatus(t('error'));
+      }
     });
 
     const content = document.createElement('div');
@@ -245,11 +258,16 @@ async function handleAddPoint() {
     return;
   }
 
-  state = await window.api.addItem(title, description);
-  renderItems();
-  resetForm();
-  setFormVisible(false);
-  setStatus(t('saved'));
+  try {
+    state = await window.api.addItem(title, description);
+    renderItems();
+    resetForm();
+    setFormVisible(false);
+    setStatus(t('saved'));
+  } catch (err) {
+    console.error(err);
+    setStatus(t('error'));
+  }
 }
 
 function setLanguage(language) {
@@ -282,7 +300,14 @@ function toggleLanguage() {
 async function init() {
   applyTheme();
   applyTranslations();
-  state = await window.api.getState();
+
+  try {
+    state = await window.api.getState();
+  } catch (err) {
+    console.error(err);
+    setStatus(t('error'));
+  }
+
   setFormVisible(false);
   renderItems();
 
@@ -330,9 +355,14 @@ async function init() {
   });
 
   document.getElementById('reset-btn').addEventListener('click', async () => {
-    state = await window.api.resetInterview();
-    renderItems();
-    setStatus(t('resetDone'));
+    try {
+      state = await window.api.resetInterview();
+      renderItems();
+      setStatus(t('resetDone'));
+    } catch (err) {
+      console.error(err);
+      setStatus(t('error'));
+    }
   });
 }
 
