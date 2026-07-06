@@ -102,12 +102,6 @@ function deleteItem(id) {
   return getState();
 }
 
-function updateItemText(id, text) {
-  db.run('UPDATE items SET title = ? WHERE id = ?', [text, id]);
-  persist();
-  return getState();
-}
-
 function toggleItem(id, checked) {
   db.run('UPDATE items SET checked = ? WHERE id = ?', [checked ? 1 : 0, id]);
   persist();
@@ -125,7 +119,6 @@ module.exports = {
   getState,
   addItem,
   deleteItem,
-  updateItemText,
   toggleItem,
   resetInterview
 };
