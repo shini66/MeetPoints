@@ -1,5 +1,6 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const db = require('./db');
 
 let mainWindow;
@@ -62,3 +63,39 @@ handle('add-item', (_e, title, description) => db.addItem(title, description));
 handle('delete-item', (_e, id) => db.deleteItem(id));
 handle('toggle-item', (_e, id, checked) => db.toggleItem(id, checked));
 handle('reset-interview', () => db.resetInterview());
+
+function csvEscape(value) {
+  const str = String(value ?? '');
+  return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+}
+
+function toCsv(items) {
+  const header = 'title,description,checked';
+  const rows = items.map((item) =>
+    [item.title, item.description, item.checked ? '1' : '0'].map(csvEscape).join(',')
+  );
+  return [header, ...rows].join('\n');
+}
+
+handle('export-data', async () => {
+  const { canceled, filePath } = await dialog.showSaveDialog(mainWindow, {
+    title: 'Exportar checklist',
+    defaultPath: 'meetpoints-checklist.json',
+    filters: [
+      { name: 'JSON', extensions: ['json'] },
+      { name: 'CSV', extensions: ['csv'] }
+    ]
+  });
+
+  if (canceled || !filePath) {
+    return { exported: false };
+  }
+
+  const { items } = db.getState();
+  const content = filePath.toLowerCase().endsWith('.csv')
+    ? toCsv(items)
+    : JSON.stringify(items, null, 2);
+
+  fs.writeFileSync(filePath, content, 'utf-8');
+  return { exported: true, filePath };
+});

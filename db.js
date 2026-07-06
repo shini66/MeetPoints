@@ -61,7 +61,9 @@ function migrateDb() {
 
 function persist() {
   const data = db.export();
-  fs.writeFileSync(dbPath, Buffer.from(data));
+  const tmpPath = `${dbPath}.tmp`;
+  fs.writeFileSync(tmpPath, Buffer.from(data));
+  fs.renameSync(tmpPath, dbPath);
 }
 
 function getState() {

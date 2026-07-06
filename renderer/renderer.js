@@ -33,6 +33,8 @@ const copy = {
     deleted: 'Punto eliminado',
     resetDone: 'Checklist listo para una nueva entrevista',
     error: 'Algo falló. Probá de nuevo.',
+    exportLabel: 'Exportar',
+    exported: 'Exportado correctamente',
     deleteAria: 'Eliminar punto {title}',
     deleteMessage: 'Vas a eliminar "{title}". Esta acción no se puede deshacer.',
     deleteFallbackTitle: 'este punto',
@@ -58,6 +60,8 @@ const copy = {
     deleted: 'Point deleted',
     resetDone: 'Checklist ready for a new interview',
     error: 'Something went wrong. Please try again.',
+    exportLabel: 'Export',
+    exported: 'Exported successfully',
     deleteAria: 'Delete point {title}',
     deleteMessage: 'You are about to delete "{title}". This action cannot be undone.',
     deleteFallbackTitle: 'this point',
@@ -331,6 +335,17 @@ async function init() {
   });
 
   submitPointButton.addEventListener('click', handleAddPoint);
+  document.getElementById('export-btn').addEventListener('click', async () => {
+    try {
+      const result = await window.api.exportData();
+      if (result.exported) {
+        setStatus(t('exported'));
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus(t('error'));
+    }
+  });
   cancelDeleteButton.addEventListener('click', closeDeleteModal);
   confirmDeleteButton.addEventListener('click', confirmDelete);
   themeToggleButton.querySelector('input').addEventListener('change', toggleTheme);
