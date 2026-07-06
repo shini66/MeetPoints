@@ -37,6 +37,7 @@ const copy = {
     exported: 'Exportado correctamente',
     importLabel: 'Importar',
     imported: 'Importado correctamente',
+    dataMenuLabel: 'Más opciones',
     progress: '{checked}/{total} completados',
     deleteAria: 'Eliminar punto {title}',
     deleteMessage: 'Vas a eliminar "{title}". Esta acción no se puede deshacer.',
@@ -67,6 +68,7 @@ const copy = {
     exported: 'Exported successfully',
     importLabel: 'Import',
     imported: 'Imported successfully',
+    dataMenuLabel: 'More options',
     progress: '{checked}/{total} completed',
     deleteAria: 'Delete point {title}',
     deleteMessage: 'You are about to delete "{title}". This action cannot be undone.',
@@ -106,6 +108,10 @@ function applyTranslations() {
 
   document.querySelectorAll('[data-i18n-title]').forEach((element) => {
     element.title = t(element.dataset.i18nTitle);
+  });
+
+  document.querySelectorAll('[data-i18n-aria-label]').forEach((element) => {
+    element.setAttribute('aria-label', t(element.dataset.i18nAriaLabel));
   });
 
   updateControlButtons();
@@ -464,7 +470,28 @@ async function init() {
   });
 
   submitPointButton.addEventListener('click', handleAddPoint);
+
+  const dataMenuButton = document.getElementById('data-menu-btn');
+  const dataMenu = document.getElementById('data-menu');
+
+  function setDataMenuVisible(isVisible) {
+    dataMenu.classList.toggle('hidden', !isVisible);
+    dataMenuButton.setAttribute('aria-expanded', String(isVisible));
+  }
+
+  dataMenuButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setDataMenuVisible(dataMenu.classList.contains('hidden'));
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!dataMenu.classList.contains('hidden') && !dataMenu.contains(event.target)) {
+      setDataMenuVisible(false);
+    }
+  });
+
   document.getElementById('export-btn').addEventListener('click', async () => {
+    setDataMenuVisible(false);
     try {
       const result = await window.api.exportData();
       if (result.exported) {
@@ -476,6 +503,7 @@ async function init() {
     }
   });
   document.getElementById('import-btn').addEventListener('click', async () => {
+    setDataMenuVisible(false);
     try {
       const result = await window.api.importData();
       if (result.imported) {
@@ -506,8 +534,12 @@ async function init() {
   });
 
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && !deleteModal.classList.contains('hidden')) {
+    if (event.key !== 'Escape') return;
+
+    if (!deleteModal.classList.contains('hidden')) {
       closeDeleteModal();
+    } else if (!dataMenu.classList.contains('hidden')) {
+      setDataMenuVisible(false);
     }
   });
 

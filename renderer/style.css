@@ -215,6 +215,50 @@ input[type="text"] {
   color: var(--accent);
 }
 
+.menu-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 40px;
+  padding: 10px;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  box-shadow: 0 8px 24px var(--shadow);
+  z-index: 10;
+}
+
+.dropdown-menu.hidden {
+  display: none;
+}
+
+.dropdown-menu button {
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.dropdown-menu button:hover {
+  background: var(--chip-active-bg);
+}
+
 .add-point-form,
 .checklist {
   border: 1px solid var(--border);

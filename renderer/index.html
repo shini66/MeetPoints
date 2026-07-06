@@ -48,12 +48,17 @@
     <button id="toggle-form-btn">
       <span data-i18n="addPoint">Agregar punto</span>
     </button>
-    <button id="export-btn">
-      <span data-i18n="exportLabel">Exportar</span>
-    </button>
-    <button id="import-btn">
-      <span data-i18n="importLabel">Importar</span>
-    </button>
+    <div class="menu-wrapper">
+      <button id="data-menu-btn" class="icon-btn" aria-haspopup="true" aria-expanded="false" data-i18n-aria-label="dataMenuLabel">⋮</button>
+      <div id="data-menu" class="dropdown-menu hidden" role="menu">
+        <button id="export-btn" role="menuitem">
+          <span data-i18n="exportLabel">Exportar</span>
+        </button>
+        <button id="import-btn" role="menuitem">
+          <span data-i18n="importLabel">Importar</span>
+        </button>
+      </div>
+    </div>
   </header>
 
   <p id="progress" class="progress"></p>
