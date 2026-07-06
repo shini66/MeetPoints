@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>MeetPoints</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <section class="topbar">
+    <div>
+      <span class="app-badge">
+        <span class="app-badge-meet">Meet</span><span class="app-badge-points">Points</span>
+      </span>
+    </div>
+    <div class="topbar-controls" aria-label="View controls">
+      <label id="theme-toggle-btn" class="switch-lang">
+        <input id="theme-input" type="checkbox" />
+        <div class="slider-lang">
+          <span class="lang-thumb"></span>
+          <span class="lang-opt theme-sun">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </span>
+          <span class="lang-opt theme-moon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </span>
+        </div>
+      </label>
+      <label id="language-toggle-btn" class="switch-lang">
+        <input id="lang-input" type="checkbox" />
+        <div class="slider-lang">
+          <span class="lang-thumb"></span>
+          <span class="lang-opt lang-es">ES</span>
+          <span class="lang-opt lang-en">EN</span>
+        </div>
+      </label>
+    </div>
+  </section>
+
+  <header class="toolbar">
+    <button id="reset-btn" data-i18n-title="resetTooltip">
+      <span data-i18n="newInterview">Nueva entrevista</span>
+    </button>
+    <button id="toggle-form-btn">
+      <span data-i18n="addPoint">Agregar punto</span>
+    </button>
+  </header>
+
+  <section id="add-point-form" class="add-point-form hidden">
+    <input id="point-title" type="text" data-i18n-placeholder="titlePlaceholder" />
+    <textarea id="point-description" rows="3" data-i18n-placeholder="descriptionPlaceholder"></textarea>
+    <button id="submit-point-btn" data-i18n="add">Agregar</button>
+  </section>
+
+  <main id="items" class="checklist"></main>
+
+  <div id="delete-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title" aria-describedby="delete-modal-message">
+    <div class="modal-card">
+      <h2 id="delete-modal-title" data-i18n="deletePointTitle">Eliminar punto</h2>
+      <p id="delete-modal-message"></p>
+      <div class="modal-actions">
+        <button id="cancel-delete-btn" type="button" data-i18n="cancel">Cancelar</button>
+        <button id="confirm-delete-btn" type="button" class="danger-btn" data-i18n="delete">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span id="status"></span>
+  </footer>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

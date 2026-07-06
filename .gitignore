@@ -1,0 +1,9 @@
+/.atl
+/node_modules
+Thumbs.db
+dist/
+out/
+release/
+.env
+*.log
+npm-debug.log*
